@@ -13,6 +13,7 @@ from datetime import datetime  # Import the date type
 import traceback
 from typing import List
 import json
+from app import main
 
 app = FastAPI()
 
@@ -96,24 +97,12 @@ async def send_message(to, message):
         async with httpx.AsyncClient() as client:
             payload = {
                 "messaging_product": "whatsapp",
+                "recipient_type": "individual",
                 "to": to,
-                "type": "template",
-                "template": {
-                "name": "mentor_temp",
-                "language": {
-                    "code": "en_US",
-                    "policy": "deterministic"
-                },
-                "components": [
-                    {
-                    "type": "body",
-                    "parameters": [
-                        {
-                            "type": "text","text": message
-                        }
-                    ]
-                    }
-                ]
+                
+                "type": "text",
+                "text": {
+                    "body": message
                 }
             }
             headers = {
@@ -126,6 +115,16 @@ async def send_message(to, message):
     except Exception as e:
         print(traceback.format_exc())
         print(str(e))
+
+
+@app.get(base_url + "/get-message", status_code=200)
+async def generate_response(msg: str, request: Request, response: Response):
+    await send_message("918699437166", msg)
+    # request_body = await request.body()
+    # request_body_json = request_body.decode("utf-8")  # Decode byte string to UTF-8
+    # request_body_data = json.loads(request_body_json)  # Parse JSON data
+    print(msg)  # Print the request body
+
 
 @app.post(base_url + "/webhook", status_code=200)
 async def webhook_msg(request: Request, response: Response):
@@ -142,16 +141,14 @@ async def webhook_msg(request: Request, response: Response):
         msg_from = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
         msg_body = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
 
-
         user_message = {
             'from': msg_from,
             'text': msg_body
         }
         print("user_message = ", user_message)
 
+        output, chat_history = await main(user_message['text'], [])
 
-        answer = "Hi, I am Vaibhav"
-
-        await send_message(msg_from, answer)
+        await send_message(msg_from, output)
 
     return {"message": "Request received"}
