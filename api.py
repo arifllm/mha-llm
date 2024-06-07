@@ -14,6 +14,7 @@ import traceback
 from typing import List
 import json
 from app import main
+from manage_json import get_user_chat_history
 
 app = FastAPI()
 
@@ -147,7 +148,9 @@ async def webhook_msg(request: Request, response: Response):
         }
         print("user_message = ", user_message)
 
-        output, chat_history = main(user_message['text'], [])
+        user_chat_history = get_user_chat_history(msg_from, msg_body)
+
+        output, chat_history = main(user_message['text'], user_chat_history)
         print("OUTPUT: ", output)
         await send_message(msg_from, output)
 
