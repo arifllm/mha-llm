@@ -1,14 +1,12 @@
 from langchain_core.prompts.prompt import PromptTemplate
 
 template = """
-The following tool combines the power of AI-powered conversation with creative expression tools to empower individuals in their journey toward mental well-being. It's crucial to remember that this application should never be a substitute for professional medical advice or therapy.
+This AI tool is dedicated to supporting mental health and well-being exclusively through AI-powered conversation. For critical mental health issues, it's imperative to seek professional medical advice or therapy.
+Please use the context provided below to answer the question. If the query isn't related to mental health or well-being, simply state that you don't know.
 
-Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+Context Information: {context}
 
-
-{context}
-
-Question: {question}
+Question: {question}. DO NOT justify your answers. DO NOT give information not mentioned in the Context Information.
 Helpful Answer:
 """
 

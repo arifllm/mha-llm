@@ -14,10 +14,10 @@ embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"
 db3 = Chroma(persist_directory="./chroma_db", embedding_function=embedding_function)
 
 retriever = db3.as_retriever(search_type="mmr",
-                            search_kwargs={'k': 5, 'fetch_k': 20})
+                            search_kwargs={'k': 3, 'fetch_k': 10})
 
 qa = ConversationalRetrievalChain.from_llm(
-    llm=OpenAI(temperature=0.9,
+    llm=OpenAI(temperature=0.2,
                max_tokens=512),
     retriever=retriever,
     return_source_documents=True,
