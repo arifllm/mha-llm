@@ -63,6 +63,7 @@ def welcome(request: Request, response: Response):
 
 @app.get("/webhook", status_code=200)
 def webhook_callback(request: Request, response: Response):
+    print("webhook start")
     request_param = {
         "mode": request.query_params.get("hub.mode"),
         "challenge": request.query_params.get("hub.challenge"),
@@ -75,7 +76,8 @@ def webhook_callback(request: Request, response: Response):
 
         if request_param["mode"] == "subscribe" and request_param["verify_token"] == my_token:
             response.status_code = status.HTTP_200_OK
-            return request_param["challenge"]
+            #return request_param["challenge"]
+            return JSONResponse(content=int(request_param["challenge"]))
         else:
             response.status_code = status.HTTP_403_FORBIDDEN
             
