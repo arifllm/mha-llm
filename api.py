@@ -1,5 +1,7 @@
 import httpx
 from typing import Union
+import string    
+import random # define the random module  
 import os
 import traceback
 import logging
@@ -14,7 +16,7 @@ import traceback
 from typing import List
 import json
 from app import main
-from manage_json import get_user_chat_history
+from manage_json import get_user_chat_history, update_answer
 
 app = FastAPI()
 
@@ -127,6 +129,12 @@ async def generate_response(msg: str, request: Request, response: Response):
     print(msg)  # Print the request body
 
 
+def generate_random_id():
+    S = 18  # number of characters in the string.  
+    # call random.choices() string module to find the string in Uppercase + numeric data.  
+    ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = S))    
+    return str(ran)
+
 @app.post(base_url + "/webhook", status_code=200)
 async def webhook_msg(request: Request, response: Response):
     request_body = await request.body()
@@ -148,10 +156,15 @@ async def webhook_msg(request: Request, response: Response):
         }
         print("user_message = ", user_message)
 
-        user_chat_history = get_user_chat_history(msg_from, msg_body)
+        if not msg_body:
+            return
+        
+        question_id = generate_random_id()
+        user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
 
         output, chat_history = main(user_message['text'], user_chat_history)
         print("OUTPUT: ", output)
+        update_answer(msg_from, question_id, output)
         await send_message(msg_from, output)
 
     return {"message": "Request received"}
