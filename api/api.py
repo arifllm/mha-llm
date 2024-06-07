@@ -5,7 +5,7 @@ import logging
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File
 from fastapi import FastAPI, Request, Depends, UploadFile, status, Response, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from sqlalchemy.orm import Session
 import sys
 from datetime import datetime  # Import the date type
@@ -24,6 +24,37 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/privacy-policy", status_code=200)
+def welcome(request: Request, response: Response):
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Privacy Policy</title>
+    </head>
+    <body>
+        <h3>Introduction</h3>
+        <p>Soul Canvas ("we," "our," "us") is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and shared when you visit or make a purchase from [Your Website/App Name] (the "Site" or "App").</p>
+        <h3>Information We Collect</h3>
+        <p> 
+            When you visit the Site, we automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device. Additionally, as you browse the Site, we collect information about the individual web pages or products that you view, what websites or search terms referred you to the Site, and information about how you interact with the Site. We refer to this automatically collected information as "Device Information."
+        </p>
+        <h3>How We Use Your Information</h3>
+        <p>
+            We use the Order Information that we collect generally to fulfill any orders placed through the Site (including processing your payment information, arranging for shipping, and providing you with invoices and/or order confirmations). Additionally, we use this Order Information to:
+
+        Communicate with you;
+        Screen our orders for potential risk or fraud; and
+        When in line with the preferences you have shared with us, provide you with information or advertising relating to our products or services.
+        We use the Device Information that we collect to help us screen for potential risk and fraud (in particular, your IP address), and more generally to improve and optimize our Site (for example, by generating analytics about how our customers browse and interact with the Site, and to assess the success of our marketing and advertising campaigns).
+        </p>
+    </body>
+    </html>
+    """
+    response.status_code = status.HTTP_200_OK
+    return HTMLResponse(content=html_content)
 
 @app.get("/", status_code=200)
 def welcome(request: Request, response: Response):
