@@ -30,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-chat_history = {
+chat_list = {
 
 }
 
@@ -149,7 +149,7 @@ async def webhook_msg(request: Request, response: Response):
         if request_body_data['entry'] and request_body_data['entry'][0]['changes'] \
             and request_body_data['entry'][0]['changes'][0]['value'] and request_body_data['entry'][0]['changes'][0]['value']['messages']:
             print("messages: ")
-            print(request_body_data['entry'][0]['changes'][0]['value']['messages'])
+            # print(request_body_data['entry'][0]['changes'][0]['value']['messages'])
 
             msg_from = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
             msg_body = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
@@ -166,20 +166,21 @@ async def webhook_msg(request: Request, response: Response):
             
             question_id = generate_random_id()
             # user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
+            global chat_list
 
             user_chat = []
-            if chat_history[msg_from]:
-                user_chat = chat_history[msg_from]
+            if chat_list[msg_from]:
+                user_chat = chat_list[msg_from]
 
             print("user history: ", user_chat)
-            output, chat_history = main(user_message['text'], user_chat)
+            output, user_chat = main(user_message['text'], user_chat)
             # print("OUTPUT: ", output)
             # update_answer(msg_from, question_id, output)
-            chat_history[msg_from].append((msg_body, output))
+            chat_list[msg_from] = user_chat
             await send_message(msg_from, output)
 
             return {"message": "Request received"}
     except Exception as e:
-        print(str(e))
+        print("Exception: ", str(e))
 
     
