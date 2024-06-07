@@ -64,7 +64,7 @@ def welcome(request: Request, response: Response):
     response.status_code = status.HTTP_200_OK
     return "Welcome to webhook"
 
-@app.get("/webhook", status_code=200)
+@app.get(base_url + "/webhook", status_code=200)
 def webhook_callback(request: Request, response: Response):
     print("webhook start")
     request_param = {
