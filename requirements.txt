@@ -1,0 +1,14 @@
+langchain
+langchain_community
+langchain_core
+langchain_openai
+langchain_text_splitters
+openai
+pydub
+python-dotenv
+pypdf
+langchain-chroma
+sentence-transformers
+unstructured
+python-csv
+datasets
