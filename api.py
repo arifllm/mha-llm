@@ -169,7 +169,7 @@ async def webhook_msg(request: Request, response: Response):
             global chat_list
 
             user_chat = []
-            if chat_list[msg_from]:
+            if chat_list.get(msg_from, None) is not None:
                 user_chat = chat_list[msg_from]
 
             print("user history: ", user_chat)
