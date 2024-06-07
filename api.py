@@ -30,6 +30,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+chat_history = {
+
+}
 
 base_url = "/api"
 
@@ -137,34 +140,46 @@ def generate_random_id():
 
 @app.post(base_url + "/webhook", status_code=200)
 async def webhook_msg(request: Request, response: Response):
-    request_body = await request.body()
-    request_body_json = request_body.decode("utf-8")  # Decode byte string to UTF-8
-    request_body_data = json.loads(request_body_json)  # Parse JSON data
-    print(request_body_data)  # Print the request body
+    try:
+        request_body = await request.body()
+        request_body_json = request_body.decode("utf-8")  # Decode byte string to UTF-8
+        request_body_data = json.loads(request_body_json)  # Parse JSON data
+        print(request_body_data)  # Print the request body
 
-    if request_body_data['entry'] and request_body_data['entry'][0]['changes'] \
-        and request_body_data['entry'][0]['changes'][0]['value'] and request_body_data['entry'][0]['changes'][0]['value']['messages']:
-        print("messages: ")
-        print(request_body_data['entry'][0]['changes'][0]['value']['messages'])
+        if request_body_data['entry'] and request_body_data['entry'][0]['changes'] \
+            and request_body_data['entry'][0]['changes'][0]['value'] and request_body_data['entry'][0]['changes'][0]['value']['messages']:
+            print("messages: ")
+            print(request_body_data['entry'][0]['changes'][0]['value']['messages'])
 
-        msg_from = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
-        msg_body = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+            msg_from = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
+            msg_body = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
 
-        user_message = {
-            'from': msg_from,
-            'text': msg_body
-        }
-        print("user_message = ", user_message)
+            user_message = {
+                'from': msg_from,
+                'text': msg_body
+            }
+            print("user_message = ", user_message)
 
-        if not msg_body:
-            return
-        
-        question_id = generate_random_id()
-        user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
+            if not msg_body:
+                print("msg body is null")
+                return
+            
+            question_id = generate_random_id()
+            # user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
 
-        output, chat_history = main(user_message['text'], user_chat_history)
-        print("OUTPUT: ", output)
-        update_answer(msg_from, question_id, output)
-        await send_message(msg_from, output)
+            user_chat = []
+            if chat_history[msg_from]:
+                user_chat = chat_history[msg_from]
 
-    return {"message": "Request received"}
+            print("user history: ", user_chat)
+            output, chat_history = main(user_message['text'], user_chat)
+            # print("OUTPUT: ", output)
+            # update_answer(msg_from, question_id, output)
+            chat_history[msg_from].append((msg_body, output))
+            await send_message(msg_from, output)
+
+            return {"message": "Request received"}
+    except Exception as e:
+        print(str(e))
+
+    
