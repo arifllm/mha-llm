@@ -1,6 +1,7 @@
 import httpx
 from typing import Union
 import os
+import traceback
 import logging
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File
@@ -26,7 +27,9 @@ app.add_middleware(
 )
 
 
-@app.get("/privacy-policy", status_code=200)
+base_url = "/api"
+
+@app.get(base_url + "/privacy-policy", status_code=200)
 def welcome(request: Request, response: Response):
     html_content = """
     <!DOCTYPE html>
@@ -56,7 +59,7 @@ def welcome(request: Request, response: Response):
     response.status_code = status.HTTP_200_OK
     return HTMLResponse(content=html_content)
 
-@app.get("/", status_code=200)
+@app.get(base_url + "/", status_code=200)
 def welcome(request: Request, response: Response):
     response.status_code = status.HTTP_200_OK
     return "Welcome to webhook"
@@ -87,39 +90,44 @@ def webhook_callback(request: Request, response: Response):
     
 
 async def send_message(to, message):
-    token = "EAAW70TyVLb8BO88ZAvNgZCCy0N0dkWaJcqgOqmSvNv7Ii7SBNdAKMdEliIT9OQ8Xqsum9nKTk4mlRnd7ZATVzQQb8gCVsgoXHFxAgGSraVCEq8ZAY8fMZCignxKsZBQlNjXdmCm4sBZAFz3gsZBZB0jrZBODT99HXZA3RCRSwOzVCx5G4P3Em0YoigXF4dZCHZAnhQ04xcIPhbzKJayL58ly0sAxOQQZDZD"
-    async with httpx.AsyncClient() as client:
-        payload = {
-            "messaging_product": "whatsapp",
-            "to": to,
-            "type": "template",
-            "template": {
-            "name": "mentor_temp",
-            "language": {
-                "code": "en_US",
-                "policy": "deterministic"
-            },
-            "components": [
-                {
-                "type": "body",
-                "parameters": [
+    try:
+
+        token = "EAAW70TyVLb8BO88ZAvNgZCCy0N0dkWaJcqgOqmSvNv7Ii7SBNdAKMdEliIT9OQ8Xqsum9nKTk4mlRnd7ZATVzQQb8gCVsgoXHFxAgGSraVCEq8ZAY8fMZCignxKsZBQlNjXdmCm4sBZAFz3gsZBZB0jrZBODT99HXZA3RCRSwOzVCx5G4P3Em0YoigXF4dZCHZAnhQ04xcIPhbzKJayL58ly0sAxOQQZDZD"
+        async with httpx.AsyncClient() as client:
+            payload = {
+                "messaging_product": "whatsapp",
+                "to": to,
+                "type": "template",
+                "template": {
+                "name": "mentor_temp",
+                "language": {
+                    "code": "en_US",
+                    "policy": "deterministic"
+                },
+                "components": [
                     {
-                        "type": "text","text": message
+                    "type": "body",
+                    "parameters": [
+                        {
+                            "type": "text","text": message
+                        }
+                    ]
                     }
                 ]
                 }
-            ]
             }
-        }
-        headers = {
-            "Authorization": f"Bearer {token}"
-        }
-        response = await client.post("https://graph.facebook.com/v19.0/336244906239007/messages", json=payload, headers=headers)
-        data = response.json()
-        print("message sent: ", data)
-        return {"data": data}
+            headers = {
+                "Authorization": f"Bearer {token}"
+            }
+            response = await client.post("https://graph.facebook.com/v19.0/336244906239007/messages", json=payload, headers=headers)
+            data = response.json()
+            print("message sent: ", data)
+            return {"data": data}
+    except Exception as e:
+        print(traceback.format_exc())
+        print(str(e))
 
-@app.post("/webhook", status_code=200)
+@app.post(base_url + "/webhook", status_code=200)
 async def webhook_msg(request: Request, response: Response):
     request_body = await request.body()
     request_body_json = request_body.decode("utf-8")  # Decode byte string to UTF-8
