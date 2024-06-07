@@ -12,3 +12,5 @@ sentence-transformers
 unstructured
 python-csv
 datasets
+pdfminer
+unstructured[pdf]
