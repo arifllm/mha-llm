@@ -116,7 +116,7 @@ async def send_message(to, message):
             }
             response = await client.post("https://graph.facebook.com/v19.0/336244906239007/messages", json=payload, headers=headers)
             data = response.json()
-            print("message sent: ", data)
+            # print("message sent: ", data)
             return {"data": data}
     except Exception as e:
         print(traceback.format_exc())
@@ -144,11 +144,11 @@ async def webhook_msg(request: Request, response: Response):
         request_body = await request.body()
         request_body_json = request_body.decode("utf-8")  # Decode byte string to UTF-8
         request_body_data = json.loads(request_body_json)  # Parse JSON data
-        print(request_body_data)  # Print the request body
+        # print(request_body_data)  # Print the request body
 
         if request_body_data['entry'] and request_body_data['entry'][0]['changes'] \
             and request_body_data['entry'][0]['changes'][0]['value'] and request_body_data['entry'][0]['changes'][0]['value']['messages']:
-            print("messages: ")
+            # print("messages: ")
             # print(request_body_data['entry'][0]['changes'][0]['value']['messages'])
 
             msg_from = request_body_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
@@ -159,12 +159,8 @@ async def webhook_msg(request: Request, response: Response):
                 'text': msg_body
             }
             print("user_message = ", user_message)
-
-            if not msg_body:
-                print("msg body is null")
-                return
             
-            question_id = generate_random_id()
+            # question_id = generate_random_id()
             # user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
             global chat_list
 
@@ -173,7 +169,7 @@ async def webhook_msg(request: Request, response: Response):
                 user_chat = chat_list[msg_from]
 
             print("user history: ", user_chat)
-            output, user_chat = main(user_message['text'], user_chat)
+            output, user_chat = main(msg_body, [])
             # print("OUTPUT: ", output)
             # update_answer(msg_from, question_id, output)
             chat_list[msg_from] = user_chat
