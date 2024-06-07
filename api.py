@@ -148,7 +148,7 @@ async def webhook_msg(request: Request, response: Response):
         print("user_message = ", user_message)
 
         output, chat_history = main(user_message['text'], [])
-
-        send_message(msg_from, output)
+        print("OUTPUT: ", output)
+        await send_message(msg_from, output)
 
     return {"message": "Request received"}
