@@ -160,12 +160,24 @@ async def webhook_msg(request: Request, response: Response):
             # question_id = generate_random_id()
             # user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
             global chat_history
+
+            if msg_body.lower() == "new session":
+                chat_history = []
+                print("New session created")
+                await send_message(msg_from, "New session created. How may I help you?")
+                return {"message": "Request received"}
+            elif msg_body.lower() == "no":
+                chat_history = []
+                await send_message(msg_from, "Thanks! It was nice talking to you :) \nHave a nice Day!\nBye!")
+                return {"message": "Request received"}
+            
             print("chat_history: ", chat_history)
 
             output, chat_history = main(msg_body, chat_history)
             # print("OUTPUT: ", output)
             # update_answer(msg_from, question_id, output)
             await send_message(msg_from, output)
+            await send_message(msg_from, "Do you have any follow up question? If not please type 'No'")
 
             return {"message": "Request received"}
     except Exception as e:
