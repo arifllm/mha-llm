@@ -16,7 +16,6 @@ import traceback
 from typing import List
 import json
 from app import main
-from manage_json import get_user_chat_history, update_answer
 
 app = FastAPI()
 

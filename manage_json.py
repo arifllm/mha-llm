@@ -64,9 +64,3 @@ def update_answer(key, question_id, answer):
 
     save_data(file_path=file_path, data=data)
 
-key="497824749255654"
-question_id = generate_random_id()
-question = "Hi,. hellodhnret 4ffff56464"
-get_user_chat_history(key, question_id, question)
-answer = "abndjbfjbjdn"
-update_answer(key, question_id, answer)
