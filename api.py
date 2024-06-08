@@ -30,9 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-chat_list = {
-
-}
+chat_history = []
 
 base_url = "/api"
 
@@ -158,21 +156,16 @@ async def webhook_msg(request: Request, response: Response):
                 'from': msg_from,
                 'text': msg_body
             }
-            print("user_message = ", user_message)
+            # print("user_message = ", user_message)
             
             # question_id = generate_random_id()
             # user_chat_history = get_user_chat_history(msg_from, question_id, msg_body)
-            global chat_list
+            global chat_history
+            print("chat_history: ", chat_history)
 
-            user_chat = []
-            if chat_list.get(msg_from, None) is not None:
-                user_chat = chat_list[msg_from]
-
-            print("user history: ", user_chat)
-            output, user_chat = main(msg_body, [])
+            output, chat_history = main(msg_body, chat_history)
             # print("OUTPUT: ", output)
             # update_answer(msg_from, question_id, output)
-            chat_list[msg_from] = user_chat
             await send_message(msg_from, output)
 
             return {"message": "Request received"}
